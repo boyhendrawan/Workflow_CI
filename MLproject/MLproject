@@ -7,7 +7,6 @@ entry_points:
     parameters:
       n_estimators: { type: int, default: 300 }
       max_depth: { type: int, default: 20 }
-      dataset_train:
-        { type: string, default: "./clean_dataset/clean_train.csv" }
-      dataset_test: { type: string, default: "./clean_dataset/clean_test.csv" }
+      dataset_train: { type: string, default: "clean_train.csv" }
+      dataset_test: { type: string, default: "clean_test.csv" }
     command: "python modelling.py {n_estimators} {max_depth} {dataset_train} {dataset_test}"

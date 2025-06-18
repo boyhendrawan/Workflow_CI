@@ -13,9 +13,9 @@ if __name__ == "__main__":
     np.random.seed(40)
 
     # Read the wine-quality csv file (make sure you're running this from the root of MLflow!)
-    file_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "./clean_dataset/clean_train.csv")
+    file_path = sys.argv[3] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "clean_train.csv")
     data_train = pd.read_csv(file_path)
-    file_path_test = sys.argv[4] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "./clean_dataset/clean_test.csv")
+    file_path_test = sys.argv[4] if len(sys.argv) > 3 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "clean_test.csv")
     data_test = pd.read_csv(file_path_test)
 
    #get data
