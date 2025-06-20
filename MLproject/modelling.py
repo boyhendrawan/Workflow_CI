@@ -24,7 +24,6 @@ if __name__ == "__main__":
 
     X_test= data_test.drop("Attrition", axis=1)
     y_test=data_test["Attrition"]
-    
     input_example = X_train[0:5]
     n_estimators = int(sys.argv[1]) if len(sys.argv) > 1 else 300
     max_depth = int(sys.argv[2]) if len(sys.argv) > 2 else 20

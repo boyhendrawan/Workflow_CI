@@ -17,53 +17,70 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v3
+        with:
+          lfs: true # Important to fetch LFS-tracked files on checkout
 
-      # Setup Python 3.12.7
-      - name: Set up Python 3.12.7
+      - name: 🐍 Set up Python 3.12.7
         uses: actions/setup-python@v4
         with:
           python-version: "3.12.7"
-      
-      # Check Env Variables
-      - name: Check Env
+
+      - name: 🔍 Check Env Variables
         run: |
-          echo $CSV_URL
-      # Install mlflow
-      - name: Install dependencies
+          echo "CSV_URL: $CSV_URL"
+          echo "TARGET_VAR: $TARGET_VAR"
+
+      - name: 📦 Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install mlflow  
-          
-      # Run as a mlflow project
-      - name: Run mlflow project
+          pip install mlflow
+
+      - name: 🚀 Run MLflow Project
         run: |
-          mlflow run MLproject --env-manager=local 
-      
-      # Get latest run_id
-      - name: Get latest MLflow run_id
+          mlflow run MLproject --env-manager=local
+
+      - name: 🧩 Set up Git LFS
+        run: |
+          sudo apt-get update && sudo apt-get install git-lfs -y
+          git lfs install
+          git config --global user.name "${{ secrets.username }}"
+          git config --global user.email "${{ secrets.email }}"
+          git lfs track "mlruns/**"
+          git add .gitattributes
+          git commit -m "Track mlruns with Git LFS" || echo "Nothing to commit"
+          git push origin main
+
+      - name: 📤 Save `mlruns` to Repo
+        run: |
+          git config --global user.name "${{ secrets.username }}"
+          git config --global user.email "${{ secrets.email }}"
+          git add mlruns/
+          git commit -m "Save mlruns from CI run" || echo "Nothing to commit"
+          git push origin main
+
+      - name: 🆔 Get latest MLflow run_id
+        id: get_run_id
         run: |
           RUN_ID=$(ls -td mlruns/0/*/ | head -n 1 | cut -d'/' -f3)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest run_id: $RUN_ID"
-          
-      # Build Docker Model
-      - name: Build Docker Model
+
+      - name: 🐳 Build Docker Model
         run: |
-          mlflow models build-docker --model-uri "runs:/$RUN_ID/model" --name "cc" 
-      # Login to Docker Hub
-      - name: Log in to Docker Hub
+          mlflow models build-docker --model-uri "runs:/${{ env.RUN_ID }}/model" --name "cc"
+
+      - name: 🔐 Log in to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      # Tag the Docker image
-      - name: Tag Docker Image
+      - name: 🏷️ Tag Docker Image
         run: |
           docker tag cc ${{ secrets.DOCKER_HUB_USERNAME }}/cc:latest
-      # Push Docker image to Docker Hub
-      - name: Push Docker Image
+
+      - name: 🚢 Push Docker Image to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/cc:latest
