@@ -33,7 +33,7 @@ if __name__ == "__main__":
     input_example = X_train.head(5)
 
     #  Start MLflow run
-    with mlflow.start_run():
+    with mlflow.start_run(nested=True):
         model = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth)
         model.fit(X_train, y_train)
 
